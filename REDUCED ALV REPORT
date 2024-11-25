@@ -1,0 +1,146 @@
+*&---------------------------------------------------------------------*
+*& Report ZPA_SCOE_ALV_REPORT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+
+REPORT ZPA_SCOE_ALV_REPORT.
+
+tables ZSD_SCOE_STUDENT  .
+
+
+
+*types : BEGIN OF TS_ZSD_SCOE_STUDENT,
+*          ZSTUDENT_ID TYPE ZSD_SCOE_STUDENT-ZSTUDENT_ID,
+*          ZMOB_NO     TYPE ZSD_SCOE_STUDENT-ZMOB_NO,
+*          ZNAME       TYPE ZSD_SCOE_STUDENT-ZNAME,
+*          ZMAIL_ID    TYPE ZSD_SCOE_STUDENT-ZMAIL_ID,
+*          ZDOB        TYPE ZSD_SCOE_STUDENT-ZDOB,
+*     END OF TS_ZSD_SCOE_STUDENT.
+
+data gt_Student  type table of ZSD_SCOE_STUDENT .    " internal table
+
+selection-screen begin of block b1 with frame title text-001.
+
+select-options : s_id for ZSD_SCOE_STUDENT-ZSTUDENT_ID .      " multiple inputs
+*                 S_NAME for ZSD_SCOE_STUDENT-ZNAME.
+selection-screen end of block b1 .
+
+
+start-of-selection. " mandatory
+
+
+select
+        ZSTUDENT_ID
+        ZMOB_NO
+        ZNAME
+        ZMAIL_ID
+        ZDOB
+  from ZSD_SCOE_STUDENT
+  into corresponding fields of table gt_Student
+  where ZSTUDENT_ID in s_id .
+
+
+  data:  lt_fcat type SLIS_T_FIELDCAT_ALV,  " hold multiple records
+         ls_fcat type SLIS_FIELDCAT_ALV.    " hold single record and put into internal table
+
+
+CALL FUNCTION 'REUSE_ALV_FIELDCATALOG_MERGE'
+ EXPORTING
+   I_STRUCTURE_NAME             =  'ZSD_SCOE_STUDENT'
+
+  CHANGING
+    CT_FIELDCAT                  = lt_fcat
+ EXCEPTIONS
+   INCONSISTENT_INTERFACE       = 1
+   PROGRAM_ERROR                = 2
+   OTHERS                       = 3
+          .
+IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+ENDIF.
+
+          .
+IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+ENDIF.
+
+**" col position , col_name ( Fieldname ), Table name( TABNAME) , column text (SELTEXT_L,SELTEXT_M,SELTEXT_S)
+**
+**
+**  LS_FCAT-COL_POS = 1.
+**  ls_fcat-FIELDNAME  = 'ZSTUDENT_ID'.    " imp
+**  ls_fcat-TABNAME    = 'GT_STUDENT'.        " imp
+**  LS_FCAT-SELTEXT_L  = 'Student Id'.          " imp
+**  ls_fcat-EDIT  = 'X' .
+**  append LS_FCAT to lt_fcat.      " --> 1 record
+**  clear LS_FCAT.
+**
+**  ls_fcat-COL_POS   = 2.
+**  ls_fcat-FIELDNAME = 'ZMOB_NO'.           " imp
+**  ls_fcat-TABNAME   = 'GT_STUDENT'.        " imp
+**  LS_FCAT-SELTEXT_L = 'Contact NO'.       " imp
+**  LS_FCAT-HOTSPOT  = 'X' .
+**  append LS_FCAT to lt_fcat.      " --> 2 record
+**  clear LS_FCAT.
+**
+**  LS_FCAT-COL_POS = 3.
+**  ls_fcat-FIELDNAME = 'ZNAME'.         " imp
+**  ls_fcat-TABNAME   = 'GT_STUDENT'.        " imp
+**  LS_FCAT-SELTEXT_L = 'Student Name'.           " imp
+**  append LS_FCAT to lt_fcat.      " --> 3 record
+**  clear LS_FCAT.
+**
+**
+**  LS_FCAT-COL_POS = 4.
+**  ls_fcat-FIELDNAME = 'ZMAIL_ID'.         " imp
+**  ls_fcat-TABNAME   = 'GT_STUDENT'.          " imp
+**  LS_FCAT-SELTEXT_L = 'Mail Id'.          " imp
+**  append LS_FCAT to lt_fcat.      "  " --> 4 record
+**  clear LS_FCAT.
+**
+**
+**  LS_FCAT-COL_POS = 5.
+**  ls_fcat-FIELDNAME = 'ZDOB'.         " imp
+**  ls_fcat-TABNAME   = 'GT_STUDENT'.          " imp
+**  LS_FCAT-SELTEXT_L = 'Date Of Birth'.
+**   LS_FCAT-DO_SUM = 'X' .           " imp
+**  append LS_FCAT to lt_fcat.      "  " --> 5 record
+**  clear LS_FCAT.
+
+****************************************************************
+
+** how to fill fieldacatalog ------ "
+** 1 ) With the help of function module ( REUSE_ALV_FIELDCATALOG_MERGE )
+*
+*CALL FUNCTION 'REUSE_ALV_FIELDCATALOG_MERGE'
+* EXPORTING
+*   I_STRUCTURE_NAME             = 'ZSD_SCOE_STUDENT'
+*  CHANGING
+*    CT_FIELDCAT                 = lt_fcat
+* EXCEPTIONS
+*   INCONSISTENT_INTERFACE       = 1
+*   PROGRAM_ERROR                = 2
+*   OTHERS                       = 3  .
+
+
+
+
+
+
+****************************
+
+
+*------ how to display records in alv format ---- *
+*1) 1 ) With the help of function module
+CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
+ EXPORTING
+   I_CALLBACK_PROGRAM                = 'ZPA_SCOE_ALV_REPORT'
+*   I_CALLBACK_USER_COMMAND           = 'USER_COMMAND'
+   IT_FIELDCAT                       = lt_fcat
+  TABLES
+    T_OUTTAB                         =  GT_STUDENT
+ EXCEPTIONS
+   PROGRAM_ERROR                     = 1
+   OTHERS                            = 2
+          .
