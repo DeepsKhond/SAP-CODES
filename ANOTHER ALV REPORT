@@ -1,0 +1,86 @@
+*&---------------------------------------------------------------------*
+*& Report ZPA_SCOE_ALV_REPORT_DEMO
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZPA_SCOE_ALV_REPORT_DEMO.
+TABLES : ZSD_SCOE_STUDENT .
+        TYPES: BEGIN OF TS_ZSD_SCOE_STUDENT,
+                 ZSTUDENT_ID TYPE ZSD_SCOE_STUDENT-ZSTUDENT_ID,
+                 ZMOB_NO     TYPE ZSD_SCOE_STUDENT-ZMOB_NO,
+                 ZNAME       TYPE ZSD_SCOE_STUDENT-ZNAME,
+                 ZMAIL_ID    TYPE ZSD_SCOE_STUDENT-ZMAIL_ID,
+*                 ZDOB        TYPE ZSD_SCOE_STUDENT-ZDOB,
+               END OF TS_ZSD_SCOE_STUDENT.
+
+
+data : it_final TYPE  TABLE of TS_ZSD_SCOE_STUDENT ,
+       wa_final type TS_ZSD_SCOE_STUDENT .
+
+selection-screen begin of block b1 with frame title text-001.
+
+select-options : s_id for ZSD_SCOE_STUDENT-ZSTUDENT_ID .      " multiple inputs
+*
+selection-screen end of block b1 .
+
+
+START-OF-SELECTION  .
+
+select
+  ZSTUDENT_ID
+  ZMOB_NO
+  ZNAME
+  ZMAIL_ID
+*  ZDOB
+  from     ZSD_SCOE_STUDENT
+  into CORRESPONDING FIELDS OF TABLE it_final
+    WHERE ZSTUDENT_ID  in s_id .
+
+   data:  lt_fcat type TABLE of SLIS_FIELDCAT_ALV,  " hold multiple records
+         ls_fcat type SLIS_FIELDCAT_ALV.    " hold single record and put into internal table
+
+
+   LS_FCAT-COL_POS = 1.
+  ls_fcat-FIELDNAME  = 'ZSTUDENT_ID'.    " imp  " coloum field name
+  ls_fcat-TABNAME    = 'IT_FINAL'.        " imp  " internal table name
+  LS_FCAT-SELTEXT_L  = 'Student Id'.          " imp "Discription
+  append LS_FCAT to lt_fcat.      " --> 1 record
+  clear LS_FCAT.
+
+
+    LS_FCAT-COL_POS = 2.
+  ls_fcat-FIELDNAME  = 'ZMOB_NO'.    " imp  " coloum field name
+  ls_fcat-TABNAME    = 'IT_FINAL'.        " imp  " internal table name
+  LS_FCAT-SELTEXT_L  = 'Mob No'.          " imp "Discription
+  append LS_FCAT to lt_fcat.      " --> 1 record
+  clear LS_FCAT.
+
+
+    LS_FCAT-COL_POS = 3.
+  ls_fcat-FIELDNAME  = 'ZNAME'.    " imp  " coloum field name
+  ls_fcat-TABNAME    = 'IT_FINAL'.        " imp  " internal table name
+  LS_FCAT-SELTEXT_L  = 'Student Name'.          " imp "Discription
+  append LS_FCAT to lt_fcat.      " --> 1 record
+  clear LS_FCAT.
+
+
+      LS_FCAT-COL_POS = 4.
+  ls_fcat-FIELDNAME  = 'ZMAIL_ID'.    " imp  " coloum field name
+  ls_fcat-TABNAME    = 'IT_FINAL'.        " imp  " internal table name
+  LS_FCAT-SELTEXT_L  = 'Mail Id'.          " imp "Discription
+  append LS_FCAT to lt_fcat.      " --> 1 record
+  clear LS_FCAT.
+
+*------ how to display records in alv format ---- *
+*1) 1 ) With the help of function module
+CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
+ EXPORTING
+   I_CALLBACK_PROGRAM                = 'ZPA_SCOE_ALV_REPORT'
+*   I_CALLBACK_USER_COMMAND           = 'USER_COMMAND'
+   IT_FIELDCAT                       = lt_fcat
+  TABLES
+    T_OUTTAB                         =  it_final
+ EXCEPTIONS
+   PROGRAM_ERROR                     = 1
+   OTHERS                            = 2
+          .
