@@ -1,0 +1,25 @@
+*&---------------------------------------------------------------------*
+*& Report ZLOCKOBJ_PRG1
+*&---------------------------------------------------------------------*
+*&
+*&----------------------------------------------------------.-----------*
+                     CALL FUNCTION 'ENQUEUE_EZ_LOCKOBJ1'
+                      EXPORTING
+                       MODE_ZDK_EMPLOYEE1       = 'S'
+                      MANDT                    = SY-MANDT
+                       EMPID                    = 1
+*                        X_EMPID                  = ' '
+*                        _SCOPE                   = '2'
+*                        _WAIT                    = ' '
+*                        _COLLECT                 = ' '
+*                      EXCEPTIONS
+*                        FOREIGN_LOCK             = 1
+*                        SYSTEM_FAILURE           = 2
+*                        OTHERS                   = 3
+                               .
+                     IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+                     ENDIF.
+
+  UPDATE ZDK_EMPLOYEE1 SET EMPNAME = 'SAI' WHERE EMPID = 1.
+REPORT ZLOCKOBJ_PRG1.
