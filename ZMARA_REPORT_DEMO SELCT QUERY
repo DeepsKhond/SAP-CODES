@@ -1,0 +1,102 @@
+*&---------------------------------------------------------------------*
+*& Report ZMARA_REPORT_DEMO
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZMARA_REPORT_DEMO.
+
+TABLES : mara  .
+types : BEGIN OF TS_MARA,
+        MATNR TYPE MARA-MATNR,
+        ERNAM TYPE MARA-ERNAM,
+        AENAM TYPE MARA-AENAM,
+        MTART TYPE MARA-MTART,
+        MBRSH TYPE MARA-MBRSH,
+        MATKL TYPE MARA-MATKL,
+        MAKTX TYPE MAKT-MAKTX,
+      END OF TS_MARA.
+
+
+      types : BEGIN OF TS_MAKT,
+        MATNR TYPE MARA-MATNR,
+        MAKTX TYPE MAKT-MAKTX,
+      END OF TS_MAKT.
+
+      data : it_final type TABLE of TS_MARA .
+      DATA : wa_final TYPE ts_mara,
+            WA_MAKT TYPE TS_MAKT.
+
+      SELECTION-SCREEN BEGIN OF BLOCK b1 WITH  FRAME TITLE text-001.
+
+        select-OPTIONS : s_matnr FOR mara-MATNR .
+        PARAMETERS : P_mtart TYPE MARA-MTART .
+
+        SELECTION-SCREEN END OF BLOCK b1  .
+
+        INITIALIZATION.
+        s_matnr-HIGH = '000000000000001038'.
+        s_matnr-LOW = '000000000000000023'.
+        s_matnr-OPTION = 'BT'.
+        S_MATNR-SIGN = 'I'.
+        APPEND S_MATNR.
+
+  AT SELECTION-SCREEN.
+    IF P_mtart = 'FERT'.
+      MESSAGE 'YOUR NOT AUTHORIZED USER TO CREATE FERT MATERIAL' TYPE 'E'.
+    ENDIF.
+
+
+        START-OF-SELECTION .
+
+*        SELECT MARA~MATNR
+*               MARA~ERNAM
+*               MARA~AENAM
+*               MARA~MTART
+*               MARA~MBRSH
+*               MARA~MATKL
+*               MAKT~MAKTX
+*          from  mara INNER JOIN MAKT ON MARA~MATNR = MAKT~MATNR
+*          into CORRESPONDING FIELDS OF TABLE it_final
+*          WHERE mara~matnr in  s_matnr or
+*                mara~MTART =  p_MTART .
+
+SELECT MATNR
+               ERNAM
+               AENAM
+               MTART
+               MBRSH
+               MATKL
+          from  mara
+          into CORRESPONDING FIELDS OF TABLE it_final
+          WHERE matnr in  s_matnr or
+                MTART =  p_MTART .
+
+ Write: 'material',
+         30 'mat_type',
+         60 'ind_sec',
+        90 'name',
+        120 'person',
+        150 'mat_grup',
+        180 'MAT_DISC'.
+ULINE.
+loop at it_final INTO wa_final .
+
+  SELECT SINGLE
+    MATNR,
+    MAKTX
+    FROM MAKT WHERE MATNR = @WA_FINAL-MATNR
+    INTO @WA_MAKT.
+
+
+write : wa_final-MATNR ,
+         30 wa_final-MTART ,
+         60 wa_final-MBRSH ,
+        90  wa_final-AENAM ,
+        120 wa_final-ERNAM ,
+        150 wa_final-MATKL ,
+        180 WA_MAKT-MAKTX.
+  ENDLOOP  .
+
+*write : 'MATERIAL NO'
+
+*  BREAK-POINT .
