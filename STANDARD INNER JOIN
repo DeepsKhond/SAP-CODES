@@ -1,0 +1,51 @@
+*&---------------------------------------------------------------------*
+*& Report ZDK_STANDARDINNERJOIN
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZDK_STANDARDINNERJOIN.
+
+
+
+
+TYPES : BEGIN OF TS_VBAK,
+        VBELN TYPE VBAK-VBELN,
+        ERDAT TYPE VBAK-ERDAT,
+        ERNAM TYPE VBAK-ERNAM,
+
+        POSNR TYPE VBAP-POSNR,
+        NAME1 TYPE KNA1-NAME1,
+      END OF TS_VBAK.
+
+DATA : IT_VBAK TYPE TABLE OF TS_VBAK,
+       WA_VBAK TYPE TS_VBAK.
+
+ SELECTION-SCREEN BEGIN OF BLOCK B1 WITH FRAME TITLE TEXT-001.
+
+    PARAMETERS: p_vbeln TYPE vbap-vbeln . " Sales document number
+
+
+   SELECTION-SCREEN END OF BLOCK B1.
+
+   START-OF-SELECTION.
+
+   SELECT VBAK~VBELN
+          VBAK~ERDAT
+          VBAK~ERNAM
+          VBAP~POSNR
+          KNA1~NAME1
+     INTO CORRESPONDING FIELDS OF TABLE IT_VBAK
+     FROM VBAP
+     INNER JOIN vbak ON vbap~vbeln = vbak~vbeln
+     INNER JOIN kna1 ON vbak~kunnr = kna1~kunnr
+      WHERE vbap~vbeln = p_vbeln.
+
+
+     LOOP AT IT_VBAK INTO WA_VBAK.
+
+        WRITE : / WA_VBAK-VBELN,
+                30 WA_VBAK-ERDAT,
+                60 WA_VBAK-ERNAM,
+                90 WA_VBAK-POSNR,
+                120 WA_VBAK-NAME1.
+     ENDLOOP.
