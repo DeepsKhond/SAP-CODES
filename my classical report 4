@@ -1,0 +1,33 @@
+
+
+REPORT  Z_DCLASSICPRG4.
+
+DATA : lv_ono TYPE ZDEONO_26.
+
+
+
+TYPES : BEGIN OF lty_data,
+        ONO TYPE ZDEONO_26,
+        ODATE TYPE ZDEODATE_26,
+        PM TYPE ZDEPM_26,
+        CURR TYPE ZDECUR_26,
+        END OF lty_data.
+
+ DATA : lt_data TYPE TABLE OF lty_data.
+ DATA : lwa_data TYPE lty_data.
+
+ TYPES : BEGIN OF lty_data1,
+        ONO TYPE ZDEONO_26,
+        OIN TYPE ZDEONO_26,
+        ICOST TYPE ZDEOITMNO_26,
+        END OF lty_data1.
+
+DATA : lt_data1 TYPE TABLE OF lty_data1.
+ DATA : lwa_data1 TYPE lty_data1.
+
+SELECT-OPTIONS : s_ono FOR lv_ono.
+
+ SELECT ono odate pm curr
+   FROM ZTABLEDO1
+   INTO TABLE lt_data
+   WHERE  ONO IN s_ono.
