@@ -1,0 +1,45 @@
+
+*HIDE AND GET CURSOR
+REPORT  Z_DINVPRG2_HIDE.
+
+TYPES : BEGIN OF lty_data,
+        ONO TYPE ZDEONO_26,
+        ODATE TYPE ZDEODATE_26,
+        PM TYPE ZDEPM_26,
+        CURR TYPE ZDECUR_26,
+        END OF lty_data.
+
+
+DATA : lt_data TYPE TABLE OF lty_data.
+DATA : lwa_data TYPE lty_data.
+DATA : lv_ono TYPE ZDEONO.
+
+TYPES : BEGIN OF lty_data1,
+        ONO TYPE ZDEONO_26,
+        OIN TYPE ZDEOITMNO_26,
+        ICOST TYPE ZDEOICOST_26,
+        END OF lty_data1.
+
+ DATA : lt_data1 TYPE TABLE OF lty_data1.
+DATA : lwa_data1 TYPE lty_data1.
+
+SELECT-OPTIONS : s_ono FOR lv_ono.
+
+START-OF-SELECTION.
+
+SELECT ono odate pm curr
+  FROM ZTABLED01
+  INTO TABLE lt_data
+  WHERE ono IN s_ono.
+
+  loop at lt_data INTO lwa_data.
+    WRITE : / lwa_data-ono , lwa_data-odate, lwa_data-pm, lwa_data-curr.
+    hide : lwa_data-ono , lwa_data-odate, lwa_data-pm, lwa_data-curr.
+   ENDLOOP.
+
+AT LINE-SELECTION.
+
+*SELECT ono oin icost
+*FROM ZTABLE02
+*INTO TABLE  lt_data1
+*WHERE ono = SY-LISEL+0(10).
