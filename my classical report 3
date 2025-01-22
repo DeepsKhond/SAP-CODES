@@ -1,0 +1,26 @@
+* fetchinf multpiple record from table.
+
+REPORT  Z_DCLASSICPRG3.
+
+TYPES : BEGIN OF lty_data,
+        ONO TYPE ZDEONO_26,
+        ODATE TYPE ZDEODATE_26,
+        TA TYPE ZDETA_26,
+        CURR TYPE ZDECUR_26,
+        END OF lty_data.
+
+DATA: lt_data TYPE TABLE OF lty_data.
+DATA : lwa_data TYPE lty_data.
+DATA : lv_ono TYPE ZDEONO_26.
+
+SELECT-OPTIONS  : s_ono FOR lv_ono.
+
+SELECT ONO ODATE TA CURR
+  FROM ZTABLED01
+  INTO TABLE lt_data
+  WHERE ONO IN s_ono .
+
+
+ LOOP at lt_data INTO lwa_data.
+   WRITE : / lwa_data-ono , lwa_data-odate , lwa_data-ta , lwa_data-curr.
+  ENDLOOP.
