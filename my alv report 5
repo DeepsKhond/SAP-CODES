@@ -1,0 +1,156 @@
+
+
+REPORT  ZALV_REPORT_SORTING.
+
+TYPES : BEGIN OF lty_vbak,
+       VBELN TYPE VBELN_VA,
+       ERDAT TYPE ERDAT,
+       ERZET TYPE ERZET,
+       ERNAM TYPE ERNAM,
+       VBTYP TYPE VBTYP,
+       END OF lty_vbak.
+
+DATA : lt_vbak TYPE TABLE OF lty_vbak.
+DATA : ls_vbak TYPE lty_vbak.
+
+
+TYPES : BEGIN OF lty_vbap,
+       VBELN TYPE VBELN_VA,
+       POSNR TYPE POSNR_VA,
+       MATNR TYPE MATNR,
+       END OF lty_vbaP.
+
+DATA : lt_vbap TYPE TABLE OF lty_vbap.
+DATA : ls_vbap TYPE lty_vbap.
+DATA : lt_fieldcat  TYPE SLIS_T_FIELDCAT_ALV.
+DATA : ls_fieldcat  TYPE SLIS_FIELDCAT_ALV.
+DATA : lt_final TYPE TABLE OF ZSTR_SALES_26.
+DATA : ls_final type ZSTR_SALES_26.
+DATA : lt_sort TYPE SLIS_T_SORTINFO_ALV.
+DATA : ls_sort TYPE slis_sortinfo_alv.
+
+
+
+DATA: lv_vbeln TYPE VBELN_VA.
+
+SELECT-OPTIONS : s_vbeln FOR lv_vbeln.
+
+SELECT  vbeln erdat erzet ernam vbtyp
+  FROM vbak
+  INTO TABLE lt_vbak
+  WHERE vbeln IN s_vbeln.
+
+*NOT INITIAL MEANS NOT NULL
+
+ IF LT_vbak IS NOT INITIAL.
+   SELECT vbeln posnr matnr
+     FROM vbap
+     INTO TABLE lt_vbap
+     FOR ALL ENTRIES in LT_VBAK
+     where vbeln = lt_vbak-vbeln.
+  ENDIF.
+
+ls_fieldcat-col_pos = '1'.
+ls_fieldcat-fieldname = 'VBELN'.
+ls_fieldcat-tabname = 'LT_VBAK'.
+ls_fieldcat-seltext_S = 'Sales document Number'.
+APPEND ls_fieldcat to lt_fieldcat.
+CLEAR : ls_fieldcat.
+
+ls_fieldcat-col_pos = '2'.
+ls_fieldcat-fieldname = 'V'.
+ls_fieldcat-tabname = 'LT_VBAK'.
+ls_fieldcat-seltext_S = 'CREATION DATE'.
+APPEND ls_fieldcat to lt_fieldcat.
+CLEAR : ls_fieldcat.
+
+ls_fieldcat-col_pos = '3'.
+ls_fieldcat-fieldname = 'ERZET'.
+ls_fieldcat-tabname = 'LT_VBAK'.
+ls_fieldcat-seltext_S = 'TIME'.
+APPEND ls_fieldcat to lt_fieldcat.
+CLEAR : ls_fieldcat.
+
+ls_fieldcat-col_pos = '4'.
+ls_fieldcat-fieldname = 'ERNAM'.
+ls_fieldcat-tabname = 'LT_VBAK'.
+ls_fieldcat-seltext_S = 'USER'.
+APPEND ls_fieldcat to lt_fieldcat.
+CLEAR : ls_fieldcat.
+
+ls_fieldcat-col_pos = '5'.
+ls_fieldcat-fieldname = 'VBTYP'.
+ls_fieldcat-tabname = 'LT_VBAK'.
+ls_fieldcat-seltext_S = 'DOC CATEGORY'.
+APPEND ls_fieldcat to lt_fieldcat.
+CLEAR : ls_fieldcat.
+
+ls_fieldcat-col_pos = '1'.
+ls_fieldcat-fieldname = 'VBELN'.
+ls_fieldcat-tabname = 'LT_VBAP'.
+ls_fieldcat-seltext_S = 'DOC CATEGORY'.
+APPEND ls_fieldcat to lt_fieldcat.
+CLEAR : ls_fieldcat.
+
+ls_fieldcat-col_pos = '2'.
+ls_fieldcat-fieldname = 'POSNR'.
+ls_fieldcat-tabname = 'LT_VBAP'.
+ls_fieldcat-seltext_l = 'ITEM NO'.
+APPEND ls_fieldcat to lt_fieldcat.
+CLEAR : ls_fieldcat.
+
+ls_fieldcat-col_pos = '3'.
+ls_fieldcat-fieldname = 'MATNR'.
+ls_fieldcat-tabname = 'LT_VBAP'.
+ls_fieldcat-seltext_S = 'MATERIAL NUMBER'.
+APPEND ls_fieldcat to lt_fieldcat.
+CLEAR : ls_fieldcat.
+
+
+
+ls_sort-fieldname = 'ERDAT'.
+ls_sort-down = 'X'.
+APPEND ls_sort to lt_sort.
+
+ CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
+ EXPORTING
+*    I_INTERFACE_CHECK              = ' '
+*    I_BYPASSING_BUFFER             =
+*    I_BUFFER_ACTIVE                = ' '
+*    I_CALLBACK_PROGRAM             = ' '
+*    I_CALLBACK_PF_STATUS_SET       = ' '
+*    I_CALLBACK_USER_COMMAND        = ' '
+*    I_STRUCTURE_NAME               =
+*    IS_LAYOUT                      =
+    IT_FIELDCAT                    = lt_fieldcat
+*    IT_EXCLUDING                   =
+*    IT_SPECIAL_GROUPS              =
+    IT_SORT                        = lt_sort
+*    IT_FILTER                      =
+*    IS_SEL_HIDE                    =
+*    I_DEFAULT                      = 'X'
+*    I_SAVE                         = ' '
+*    IS_VARIANT                     =
+*    IT_EVENTS                      =
+*    IT_EVENT_EXIT                  =
+*    IS_PRINT                       =
+*    IS_REPREP_ID                   =
+*    I_SCREEN_START_COLUMN          = 0
+*    I_SCREEN_START_LINE            = 0
+*    I_SCREEN_END_COLUMN            = 0
+*    I_SCREEN_END_LINE              = 0
+*    IR_SALV_LIST_ADAPTER           =
+*    IT_EXCEPT_QINFO                =
+*    I_SUPPRESS_EMPTY_DATA          = ABAP_FALSE
+*  IMPORTING
+*    E_EXIT_CAUSED_BY_CALLER        =
+*    ES_EXIT_CAUSED_BY_USER         =
+   TABLES
+     T_OUTTAB                       = lt_final
+*  EXCEPTIONS
+*    PROGRAM_ERROR                  = 1
+*    OTHERS                         = 2
+           .
+ IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+ ENDIF.
