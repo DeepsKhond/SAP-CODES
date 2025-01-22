@@ -1,0 +1,111 @@
+
+
+REPORT  ZALV_REPORTD3.
+
+TYPES : BEGIN OF lty_vbak,
+       VBELN TYPE VBELN_VA,
+       ERDAT TYPE ERDAT,
+       ERZET TYPE ERZET,
+       ERNAM TYPE ERNAM,
+       VBTYP TYPE VBTYP,
+       END OF lty_vbak.
+
+DATA : lt_vbak TYPE TABLE OF lty_vbak.
+DATA : ls_vbak TYPE lty_vbak.
+
+
+TYPES : BEGIN OF lty_vbap,
+       VBELN TYPE VBELN_VA,
+       POSNR TYPE POSNR_VA,
+       MATNR TYPE MATNR,
+       END OF lty_vbaP.
+
+DATA : lt_vbap TYPE TABLE OF lty_vbap.
+DATA : ls_vbap TYPE lty_vbap.
+DATA : lt_fieldcat  TYPE SLIS_T_FIELDCAT_ALV.
+DATA : ls_fieldcat  TYPE SLIS_FIELDCAT_ALV.
+DATA : lt_final TYPE TABLE OF ZSTR_SALES_26.
+DATA : ls_final type ZSTR_SALES_26.
+
+DATA: lv_vbeln TYPE VBELN_VA.
+
+SELECT-OPTIONS : s_vbeln FOR lv_vbeln.
+
+SELECT  vbeln erdat erzet ernam vbtyp
+  FROM vbak
+  INTO TABLE lt_vbak
+  WHERE vbeln IN s_vbeln.
+
+*NOT INITIAL MEANS NOT NULL
+
+ IF LT_vbak IS NOT INITIAL.
+   SELECT vbeln posnr matnr
+     FROM vbap
+     INTO TABLE lt_vbap
+     FOR ALL ENTRIES in LT_VBAK
+     where vbeln = lt_vbak-vbeln.
+  ENDIF.
+
+  loop at lt_vbak INTO ls_vbak.
+    loop at lt_vbap INTO ls_vbap WHERE vbeln = ls_vbak-vbeln.
+      ls_final-vbeln = ls_vbak-vbeln.
+        ls_final-erdat = ls_vbak-erdat.
+          ls_final-erzet = ls_vbak-erzet.
+            ls_final-ernam = ls_vbak-ernam.
+              ls_final-vbtyp = ls_vbak-vbtyp.
+                ls_final-posnr = ls_vbap-posnr.
+                  ls_final-matnr = ls_vbap-matnr.
+
+      APPEND ls_final TO lt_final.
+      CLEAR: ls_final.
+      ENDLOOP.
+      ENDLOOP.
+
+ls_fieldcat-col_pos = '1'.
+ls_fieldcat-fieldname = 'VBELN'.
+ls_fieldcat-tabname = 'LT_FINAL'.
+ls_fieldcat-seltext_S = 'Sales document Number'.
+APPEND ls_fieldcat to lt_fieldcat.
+CLEAR : ls_fieldcat.
+
+ls_fieldcat-col_pos = '2'.
+ls_fieldcat-fieldname = 'V'.
+ls_fieldcat-tabname = 'LT_FINAL'.
+ls_fieldcat-seltext_S = 'CREATION DATE'.
+APPEND ls_fieldcat to lt_fieldcat.
+CLEAR : ls_fieldcat.
+
+ls_fieldcat-col_pos = '3'.
+ls_fieldcat-fieldname = 'ERZET'.
+ls_fieldcat-tabname = 'LT_FINAL'.
+ls_fieldcat-seltext_S = 'TIME'.
+APPEND ls_fieldcat to lt_fieldcat.
+CLEAR : ls_fieldcat.
+
+ls_fieldcat-col_pos = '4'.
+ls_fieldcat-fieldname = 'ERNAM'.
+ls_fieldcat-tabname = 'LT_FINAL'.
+ls_fieldcat-seltext_S = 'NAME'.
+APPEND ls_fieldcat to lt_fieldcat.
+CLEAR : ls_fieldcat.
+
+ls_fieldcat-col_pos = '5'.
+ls_fieldcat-fieldname = 'VBTYP'.
+ls_fieldcat-tabname = 'LT_FINAL'.
+ls_fieldcat-seltext_S = 'DOC CATEGORY'.
+APPEND ls_fieldcat to lt_fieldcat.
+CLEAR : ls_fieldcat.
+
+ls_fieldcat-col_pos = '6'.
+ls_fieldcat-fieldname = 'POSNR'.
+ls_fieldcat-tabname = 'LT_FINAL'.
+ls_fieldcat-seltext_l = 'ITEM NO'.
+APPEND ls_fieldcat to lt_fieldcat.
+CLEAR : ls_fieldcat.
+
+ls_fieldcat-col_pos = '7'.
+ls_fieldcat-fieldname = 'MATNR'.
+ls_fieldcat-tabname = 'LT_FINAL'.
+ls_fieldcat-seltext_S = 'MATERIAL NUMBER'.
+APPEND ls_fieldcat to lt_fieldcat.
+CLEAR : ls_fieldcat.
