@@ -1,0 +1,45 @@
+
+
+REPORT  Z_DINVPRG3_USERCOMMAND.
+
+TYPES : BEGIN OF lty_data,
+        ONO TYPE ZDEONO_26,
+        ODATE TYPE ZDEODATE_26,
+        PM TYPE ZDEPM_28,
+        CURR TYPE ZDECUR_28,
+        END OF lty_data.
+
+DATA : lt_data TYPE TABLE OF lty_data.
+DATA : lwa_data TYPE lty_data.
+DATA : lv_ono TYPE ZDEONO_26.
+
+SELECT-OPTIONS : s_ono FOR lv_ono.
+
+START-OF-SELECTION.
+
+  SELECT ono odate pm curr
+    FROM ZTABLED01
+    INTO TABLE lt_data
+    WHERE ono in s_ono.
+
+  Loop at lt_data INTO lwa_data.
+    write :/ lwa_data-ono,lwa_data-odate,lwa_data-pm,lwa_data-curr.
+  ENDLOOP.
+
+  SET PF-STATUS 'FUNCTION'.
+
+  AT USER-COMMAND.
+   IF sy-ucomm = 'ASCENDING'.
+     SORT lt_data BY ono.
+     loop at lt_data INTO lwa_data.
+     write : / lwa_data-ono , lwa_data-odate, lwa_data-pm , lwa_data-curr.
+     ENDLOOP.
+     ENDIF.
+
+
+     IF sy-ucomm = 'DESCENDING'.
+     SORT lt_data BY ono DESCENDING.
+     loop at lt_data INTO lwa_data.
+     write : / lwa_data-ono , lwa_data-odate, lwa_data-pm , lwa_data-curr.
+     ENDLOOP.
+     ENDIF.
