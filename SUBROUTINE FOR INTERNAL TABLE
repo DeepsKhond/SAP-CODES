@@ -1,4 +1,4 @@
-
+REPORT ZSUBROUTINE_INTERNALTABLE.
 types : begin of ty_emp
           empno type i,
           ename(20) type c, 
