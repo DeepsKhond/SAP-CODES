@@ -1,0 +1,37 @@
+
+types : begin of ty_emp
+          empno type i,
+          ename(20) type c, 
+          empdesign(20) type c,
+        end of ty_emp.
+
+data : it_emp type table of ty_emp.
+       wa_emp type ty_emp.
+
+clear wa_emp.
+wa_emp-empno = 1.
+wa_emp-ename = 'Raju'.
+wa_emp-empdesign = 'Manager'.
+append wa_emp to t_emp.
+
+clear wa_emp.
+wa_emp-empno = 12.
+wa_emp-ename = 'Gauri'.
+wa_emp-empdesign = 'Manager'.
+append wa_emp to t_emp.
+
+clear wa_emp.
+wa_emp-empno = 3.
+wa_emp-ename = 'Ram'.
+wa_emp-empdesign = 'Manager'.
+append wa_emp to t_emp.
+
+clear wa_emp.
+wa_emp-empno = 4.
+wa_emp-ename = 'Reeta'.
+wa_emp-empdesign = 'Manager'.
+append wa_emp to t_emp.
+
+LOOP AT it_emp INTO wa_emp .
+ write  :/ wa_emp-empno , wa_emp-ename , wa_emp-empdesign .
+ ENDLOOP.
