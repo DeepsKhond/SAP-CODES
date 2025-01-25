@@ -1,0 +1,18 @@
+REPORT  ZSUBROUTINE_142.
+
+
+
+
+  Data : x type i VALUE 10,
+         y type i VALUE 10.
+
+  PERFORM SUB2 USING X Y. "ACTUAL PARAMETER
+
+  FORM SUB2 USING K1 K2. "FORMAL PARAMTEER
+
+    DATA : OP type i .
+
+    op = k1 + k2.
+
+    write : 'sum is ', op.
+    ENDFORM.
