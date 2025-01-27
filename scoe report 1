@@ -8,7 +8,7 @@ DATA : f1(10) type c,
 
 PARAMETERS p_cstno(10) type c.
 
-select single kunnr land1 name1 name2
+select single kunnr land1 name1 ort01
   from kna1
   into (f1,f2,f3,f4)
   where kunnr = p_cstno.
