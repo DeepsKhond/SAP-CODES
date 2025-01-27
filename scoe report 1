@@ -1,0 +1,26 @@
+REPORT  ZSCOE_REPORT1.
+
+DATA : f1(10) type c,
+      f2(3) type c,
+      f3(35) type c,
+      f4(35) type c.
+
+
+PARAMETERS p_cstno(10) type c.
+
+select single kunnr land1 name1 name2
+  from kna1
+  into (f1,f2,f3,f4)
+  where kunnr = p_cstno.
+
+if sy-subrc eq 0.
+  message 'customer found' type 'I'.
+  write : /(30) 'customer no :', f1,
+         /(30) 'customer country :', f2,
+          /(30) 'customer name :', f3,
+          /(30) 'customer city:', f4.
+
+  else.
+
+    message : 'customer not found' type 'I'.
+ ENDIF.
