@@ -1,0 +1,49 @@
+
+REPORT  ZSCOE_REPORT1.
+
+TYPES : BEGIN OF TY_CUSTOMER,
+      KUNNR TYPE KNA1-KUNNR,
+      ORT01 TYPE KNA1-ORT01,
+      LAND1 TYPE KNA1-LAND1,
+      NAME1 TYPE KNA1-NAME1,
+      NAME2 TYPE KNA1-NAME2,
+     END OF TY_CUSTOMER.
+
+
+     DATA : t_customer type TABLE OF TY_CUSTOMER,
+           wa_customer type TY_CUSTOMER.
+
+PARAMETERS : p_land1(3) type c.
+ START-OF-SELECTION.
+  PERFORM getcustomers.
+
+  FORM GETCUSTOMERS.
+    SELECT kunnr name1 ort01 land1 name2
+      from kna1
+      into table t_customer
+      where land1 = p_land1
+
+      ORDER BY NAME1 DESCENDING. "SORTING FOR DB TABLE.
+
+  if sy-subrc eq 0.
+   write : / 'no of records retrive' , sy-dbcnt. "to count record from db table
+
+*OR
+
+   describe TABLE t_customer. "to count records form internal table
+
+   write : / 'no of records retrive', sy-tfill.
+*sort t_customer by name1.
+   loop at t_customer into wa_customer.
+     write : / wa_customer-kunnr,
+               wa_customer-name1,
+               wa_customer-ort01,
+               wa_customer-land1,
+               wa_customer-name2.
+   endloop.
+
+   else.
+     MESSAGE 'no data for given country key' type 'I'.
+
+ ENDIF.
+ ENDFORM.
