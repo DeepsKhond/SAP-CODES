@@ -1,0 +1,68 @@
+
+REPORT  ZSCOE_REPORT2.
+
+
+SELECTION-SCREEN begin of block bk1 with frame title t1.
+
+  SELECTION-SCREEN begin of line.
+  SELECTION-SCREEN comment 6(15) Lb1.
+    PARAMETERS p_matnr type mara-matnr.
+   SELECTION-SCREEN end of line.
+
+SELECTION-SCREEN end of block bk1.
+ SELECTION-SCREEN SKIP 1.
+SELECTION-SCREEN begin of block bk2 with frame title t2.
+
+  SELECTION-SCREEN begin of line.
+  SELECTION-SCREEN comment 6(15) Lb2 MODIF ID id1.
+    PARAMETERS p_mtart type mara-mtart MODIF ID id1.
+   SELECTION-SCREEN end of line.
+
+
+
+
+
+  SELECTION-SCREEN begin of line.
+  SELECTION-SCREEN comment 6(15) Lb3 MODIF ID id1.
+    PARAMETERS p_mbrsh type mara-mbrsh MODIF ID id1.
+   SELECTION-SCREEN end of line.
+
+
+
+
+
+  SELECTION-SCREEN begin of line.
+  SELECTION-SCREEN comment 6(15) Lb4 MODIF ID id1.
+    PARAMETERS p_matkl type mara-matkl MODIF ID id1.
+   SELECTION-SCREEN end of line.
+
+SELECTION-SCREEN end of block bk2.
+
+SELECTION-SCREEN skip 1.
+
+SELECTION-SCREEN PUSHBUTTON 12(25) b1 USER-COMMAND fc1.
+
+
+
+INITIALIZATION.
+lb1 = 'Material Number'.
+t1  = 'Input Block'.
+t2 = 'Material Data'.
+lb2 = 'Matetrial Type'.
+lb3 = 'Industry Sector'.
+lb4 = 'Matetrial Group'.
+b1 = 'Get material Data'.
+
+PERFORM invisibleblock2.
+form invisibleblock2.
+  loop at SCREEN.
+      if screen-group1 = 'ID1'.
+      screen-invisible = '1'.
+      screen-input = '0'.
+      MODIFY SCREEN.
+
+      ENDIF.
+
+   endloop.
+
+endform.
