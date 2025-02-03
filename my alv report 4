@@ -2,110 +2,124 @@
 
 REPORT  ZALV_REPORTD4_HIERARCHY.
 
-TYPES : BEGIN OF lty_vbak,
-       VBELN TYPE VBELN_VA,
-       ERDAT TYPE ERDAT,
-       ERZET TYPE ERZET,
-       ERNAM TYPE ERNAM,
-       VBTYP TYPE VBTYP,
-  END OF lty_vbak.
 
-  DATA : lt_vbak TYPE TABLE OF lty_vbak.
-  DATA : ls_vbak TYPE lty_vbak.
+*&---------------------------------------------------------------------*
+*& Report  ZHIERARCHICAL_ALV
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
 
-TYPES : BEGIN OF lty_vbap,
-       vbeln TYPE vbeln_va,
-       posnr TYPE posnr_va,
-       matnr TYPE matnr,
+REPORT  ZHIERARCHICAL_ALV.
 
-  END OF lty_vbap.
-
-  DATA : lt_vbap TYPE TABLE OF lty_vbap.
-  DATA : ls_vbap TYPE lty_vbap.
-  DATA : lt_fieldcat TYPE SLIS_T_FIELDCAT_ALV.
-  DATA : ls_fieldcat TYPE SLIS_FIELDCAT_ALV.
-  DATA : ls_keyinfo TYPE SLIS_KEYINFO_ALV.
-
-DATA : lv_vbeln TYPE vbeln_va.
-
-SELECT-OPTIONS : s_vbeln FOR lv_vbeln.
+TYPES : BEGIN OF TS_VBAK,
+      VBELN type VBELN_VA,
+      ERDAT TYPE ERDAT,
+      ERZET TYPE ERZET,
+      ERNAM TYPE ERNAM,
+  END OF TS_VBAK.
 
 
-SELECT vbeln erdat erzet ernam vbtyp
-  FROM vbak
-  INTO TABLE lt_vbak
-  WHERE vbeln IN s_vbeln.
+DATA : IT_VBAK TYPE TABLE OF TS_VBAK.
+DATA : LV_VBELN TYPE VBELN_VA.
 
 
-  IF lt_vbak IS NOT INITIAL.
-    SELECT vbeln posnr matnr
-      from vbap
-      into table lt_vbap
-      for all entries IN lt_vbak
-      WHERE vbeln = lt_vbak-vbeln.
+* DECLARE FIELDCATLOG INTERNAL TABLE
+DATA : IT_FIELDCAT TYPE SLIS_T_FIELDCAT_ALV,
+      LS_FIELDCAT TYPE SLIS_FIELDCAT_ALV.   "WORKAREA OF TYPE STRUCTURE
 
-    ENDIF.
+DATA : LS_KEYINFO TYPE SLIS_KEYINFO_ALV.
+
+TYPES : BEGIN OF TS_VBAP,
+      VBELN type VBELN_VA,
+      POSNR TYPE POSNR_VA,
+      MATNR TYPE MATNR,
+  END OF TS_VBAP.
+
+DATA : IT_VBAP TYPE TABLE OF TS_VBAP.
+SELECT-OPTIONS : S_VBELN FOR LV_VBELN.
+
+*FETCH DATA FROM HEADER DATA
+SELECT VBELN ERDAT ERZET  ERNAM
+  FROM VBAK
+  INTO TABLE IT_VBAK
+  WHERE VBELN IN S_VBELN.
+
+IF IT_VBAK IS NOT INITIAL.
+  SELECT VBELN POSNR MATNR
+  FROM VBAP
+  INTO TABLE IT_VBAP
+  FOR ALL ENTRIES IN IT_VBAK
+  WHERE VBELN  = IT_VBAK-VBELN.    "1st internal table vbeln act as a input the VBELN OF VBAP
+ENDIF.
+
+* SLIS_T_FIELDCAT_ALV  => STANDARD TABLE TYPE TO GENERATE A FIELDCATALOG
+
+*MANUALLY CREATING FIELDCATLOG
+
+LS_FIELDCAT-col_pos = '1'.
+LS_FIELDCAT-fieldname = 'VBELN'.
+LS_FIELDCAT-tabname = 'IT_VBAK'.
+LS_FIELDCAT-seltext_l = 'SALES DOCUMENT NUMBER'.
+APPEND LS_FIELDCAT TO IT_FIELDCAT.
+
+CLEAR LS_FIELDCAT.
+
+LS_FIELDCAT-col_pos = '2'.
+LS_FIELDCAT-fieldname = 'ERDAT'.
+LS_FIELDCAT-tabname = 'IT_VBAK'.
+LS_FIELDCAT-seltext_l = 'CREATION DATE'.
+APPEND LS_FIELDCAT TO IT_FIELDCAT.
+
+CLEAR LS_FIELDCAT.
+
+LS_FIELDCAT-col_pos = '3'.
+LS_FIELDCAT-fieldname = 'ERZET'.
+LS_FIELDCAT-tabname = 'IT_VBAK'.
+LS_FIELDCAT-seltext_l = 'TIME'.
+APPEND LS_FIELDCAT TO IT_FIELDCAT.
+
+CLEAR LS_FIELDCAT.
+
+LS_FIELDCAT-col_pos = '4'.
+LS_FIELDCAT-fieldname = 'ERNAM'.
+LS_FIELDCAT-tabname = 'IT_VBAK'.
+LS_FIELDCAT-seltext_l = 'USER'.
+APPEND LS_FIELDCAT TO IT_FIELDCAT.
+
+CLEAR LS_FIELDCAT.
+
+*FIELDS OF VBAP
+
+LS_FIELDCAT-col_pos = '1'.
+LS_FIELDCAT-fieldname = 'VBELN'.
+LS_FIELDCAT-tabname = 'IT_VBAP'.
+LS_FIELDCAT-seltext_l = 'SALES DOCUMENT NUMBER'.
+APPEND LS_FIELDCAT TO IT_FIELDCAT.
+
+CLEAR LS_FIELDCAT.
+
+LS_FIELDCAT-col_pos = '2'.
+LS_FIELDCAT-fieldname = 'POSNR'.
+LS_FIELDCAT-tabname = 'IT_VBAP'.
+LS_FIELDCAT-seltext_l = 'ITEM NUMBER'.
+APPEND LS_FIELDCAT TO IT_FIELDCAT.
+
+CLEAR LS_FIELDCAT.
 
 
-ls_fieldcat-col_pos = '1'.
-ls_fieldcat-fieldname = 'VBELN'.
-ls_fieldcat-tabname = 'LT_VBAK'.
-ls_fieldcat-seltext_S = 'Sales document Number'.
-APPEND ls_fieldcat to lt_fieldcat.
-CLEAR : ls_fieldcat.
+LS_FIELDCAT-col_pos = '3'.
+LS_FIELDCAT-fieldname = 'MATNR'.
+LS_FIELDCAT-tabname = 'IT_VBAP'.
+LS_FIELDCAT-seltext_l = 'MATERIAL NUMBER'.
+APPEND LS_FIELDCAT TO IT_FIELDCAT.
 
-ls_fieldcat-col_pos = '2'.
-ls_fieldcat-fieldname = 'V'.
-ls_fieldcat-tabname = 'LT_VBAK'.
-ls_fieldcat-seltext_S = 'CREATION DATE'.
-APPEND ls_fieldcat to lt_fieldcat.
-CLEAR : ls_fieldcat.
+CLEAR LS_FIELDCAT.
 
-ls_fieldcat-col_pos = '3'.
-ls_fieldcat-fieldname = 'ERZET'.
-ls_fieldcat-tabname = 'LT_VBAK'.
-ls_fieldcat-seltext_S = 'TIME'.
-APPEND ls_fieldcat to lt_fieldcat.
-CLEAR : ls_fieldcat.
+LS_KEYINFO-HEADER01 = 'VBELN'.
+LS_KEYINFO-ITEM01 = 'VBELN'.
 
-ls_fieldcat-col_pos = '4'.
-ls_fieldcat-fieldname = 'ERNAM'.
-ls_fieldcat-tabname = 'LT_VBAK'.
-ls_fieldcat-seltext_S = 'USER'.
-APPEND ls_fieldcat to lt_fieldcat.
-CLEAR : ls_fieldcat.
-
-ls_fieldcat-col_pos = '5'.
-ls_fieldcat-fieldname = 'VBTYP'.
-ls_fieldcat-tabname = 'LT_VBAK'.
-ls_fieldcat-seltext_S = 'DOC CATEGORY'.
-APPEND ls_fieldcat to lt_fieldcat.
-CLEAR : ls_fieldcat.
-
-ls_fieldcat-col_pos = '1'.
-ls_fieldcat-fieldname = 'VBELN'.
-ls_fieldcat-tabname = 'LT_VBAP'.
-ls_fieldcat-seltext_S = 'DOC CATEGORY'.
-APPEND ls_fieldcat to lt_fieldcat.
-CLEAR : ls_fieldcat.
-
-ls_fieldcat-col_pos = '2'.
-ls_fieldcat-fieldname = 'POSNR'.
-ls_fieldcat-tabname = 'LT_VBAP'.
-ls_fieldcat-seltext_l = 'ITEM NO'.
-APPEND ls_fieldcat to lt_fieldcat.
-CLEAR : ls_fieldcat.
-
-ls_fieldcat-col_pos = '3'.
-ls_fieldcat-fieldname = 'MATNR'.
-ls_fieldcat-tabname = 'LT_VBAP'.
-ls_fieldcat-seltext_S = 'MATERIAL NUMBER'.
-APPEND ls_fieldcat to lt_fieldcat.
-CLEAR : ls_fieldcat.
-
-
-ls_keyinfo-header01 = 'VBELN'.
-ls_keyinfo-item01 = 'VBELN'.
 
 CALL FUNCTION 'REUSE_ALV_HIERSEQ_LIST_DISPLAY'
   EXPORTING
@@ -114,7 +128,7 @@ CALL FUNCTION 'REUSE_ALV_HIERSEQ_LIST_DISPLAY'
 *   I_CALLBACK_PF_STATUS_SET       = ' '
 *   I_CALLBACK_USER_COMMAND        = ' '
 *   IS_LAYOUT                      =
-   IT_FIELDCAT                    = lt_fieldcat
+   IT_FIELDCAT                    = IT_FIELDCAT
 *   IT_EXCLUDING                   =
 *   IT_SPECIAL_GROUPS              =
 *   IT_SORT                        =
@@ -129,11 +143,11 @@ CALL FUNCTION 'REUSE_ALV_HIERSEQ_LIST_DISPLAY'
 *   IS_VARIANT                     =
 *   IT_EVENTS                      =
 *   IT_EVENT_EXIT                  =
-    I_TABNAME_HEADER               = 'LT-VBAK'
-    I_TABNAME_ITEM                 = 'LT-VBAP'
+    I_TABNAME_HEADER               = 'IT_VBAK'
+    I_TABNAME_ITEM                 = 'IT_VBAP'
 *   I_STRUCTURE_NAME_HEADER        =
 *   I_STRUCTURE_NAME_ITEM          =
-    IS_KEYINFO                     = ls_keyinfo
+    IS_KEYINFO                     = LS_KEYINFO
 *   IS_PRINT                       =
 *   IS_REPREP_ID                   =
 *   I_BYPASSING_BUFFER             =
@@ -145,8 +159,8 @@ CALL FUNCTION 'REUSE_ALV_HIERSEQ_LIST_DISPLAY'
 *   E_EXIT_CAUSED_BY_CALLER        =
 *   ES_EXIT_CAUSED_BY_USER         =
   TABLES
-    T_OUTTAB_HEADER                = lt_vbak
-    T_OUTTAB_ITEM                  = lt_vbap
+    T_OUTTAB_HEADER                = IT_VBAK
+    T_OUTTAB_ITEM                  = IT_VBAP
 * EXCEPTIONS
 *   PROGRAM_ERROR                  = 1
 *   OTHERS                         = 2
@@ -154,3 +168,8 @@ CALL FUNCTION 'REUSE_ALV_HIERSEQ_LIST_DISPLAY'
 IF SY-SUBRC <> 0.
 * Implement suitable error handling here
 ENDIF.
+ 
+
+
+
+
