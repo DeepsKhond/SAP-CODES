@@ -1,0 +1,81 @@
+REPORT  ZALV1_142.
+
+TYPES :  BEGIN OF TS_STUDINFO,
+         ID TYPE ZID001,
+         NAME TYPE ZNAME001,
+         CLASS TYPE ZCLASS001,
+         EMAIL TYPE ZEMAIL001,
+        END OF TS_STUDINFO.
+
+ DATA : IT_STUD  TYPE TABLE OF TS_STUDINFO.
+ DATA LV_ID TYPE ZSTUDINFO-ID.
+ data lt_fcat type SLIS_T_FIELDCAT_ALV.
+SELECT-OPTIONS : S_ID FOR LV_ID.
+
+SELECT ID NAME CLASS EMAIL
+  FROM
+  ZSTUDINFO INTO TABLE IT_STUD
+  WHERE ID IN S_ID.
+
+  CALL FUNCTION 'REUSE_ALV_FIELDCATALOG_MERGE'
+   EXPORTING
+     I_PROGRAM_NAME               = sy-repid
+*     I_INTERNAL_TABNAME           =
+     I_STRUCTURE_NAME             = 'zstudinfo'
+*     I_CLIENT_NEVER_DISPLAY       = 'X'
+*     I_INCLNAME                   =
+*     I_BYPASSING_BUFFER           =
+*     I_BUFFER_ACTIVE              =
+    CHANGING
+      CT_FIELDCAT                  = lt_fcat
+  EXCEPTIONS
+     INCONSISTENT_INTERFACE       = 1
+     PROGRAM_ERROR                = 2
+     OTHERS                       = 3
+            .
+  IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+  ENDIF.
+
+  CALL FUNCTION 'REUSE_ALV_LIST_DISPLAY'
+   EXPORTING
+*     I_INTERFACE_CHECK              = ' '
+*     I_BYPASSING_BUFFER             =
+*     I_BUFFER_ACTIVE                = ' '
+*     I_CALLBACK_PROGRAM             = ' '
+*     I_CALLBACK_PF_STATUS_SET       = ' '
+*     I_CALLBACK_USER_COMMAND        = ' '
+*     I_STRUCTURE_NAME               =
+*     IS_LAYOUT                      =
+     IT_FIELDCAT                    = LT_FCAT
+*     IT_EXCLUDING                   =
+*     IT_SPECIAL_GROUPS              =
+*     IT_SORT                        =
+*     IT_FILTER                      =
+*     IS_SEL_HIDE                    =
+*     I_DEFAULT                      = 'X'
+*     I_SAVE                         = ' '
+*     IS_VARIANT                     =
+*     IT_EVENTS                      =
+*     IT_EVENT_EXIT                  =
+*     IS_PRINT                       =
+*     IS_REPREP_ID                   =
+*     I_SCREEN_START_COLUMN          = 0
+*     I_SCREEN_START_LINE            = 0
+*     I_SCREEN_END_COLUMN            = 0
+*     I_SCREEN_END_LINE              = 0
+*     IR_SALV_LIST_ADAPTER           =
+*     IT_EXCEPT_QINFO                =
+*     I_SUPPRESS_EMPTY_DATA          = ABAP_FALSE
+*   IMPORTING
+*     E_EXIT_CAUSED_BY_CALLER        =
+*     ES_EXIT_CAUSED_BY_USER         =
+    TABLES
+      T_OUTTAB                       = IT_STUD
+*   EXCEPTIONS
+*     PROGRAM_ERROR                  = 1
+*     OTHERS                         = 2
+            .
+  IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+  ENDIF.
